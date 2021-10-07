@@ -42,7 +42,7 @@ namespace Win32
         private string title;
         private nint hWnd;
 
-        private bool isShown;
+        private bool isShow;
         private GCHandle unmanagedReference;
         private bool isDisposed;
 
@@ -84,7 +84,7 @@ namespace Win32
             FFI.User32.WS_EX_APPWINDOW | FFI.User32.WS_EX_WINDOWEDGE,
             this.className,
             title,
-            FFI.User32.WS_MINIMIZEBOX | FFI.User32.WS_SYSMENU | FFI.User32.WS_OVERLAPPED | FFI.User32.WS_CAPTION,
+            FFI.User32.WS_MINIMIZEBOX | FFI.User32.WS_MAXIMIZEBOX | FFI.User32.WS_OVERLAPPEDWINDOW | FFI.User32.WS_SYSMENU | FFI.User32.WS_OVERLAPPED | FFI.User32.WS_CAPTION,
             FFI.User32.CW_USEDEFAULT,
             FFI.User32.CW_USEDEFAULT,
             width,
@@ -95,26 +95,8 @@ namespace Win32
             IntPtr.Zero);
         }
 
-        private void ProcMessages()
-        {
-            while (FFI.User32.GetMessage(out var message, default, 0, 0))
-            {
-                FFI.User32.TranslateMessage(ref message);
-                FFI.User32.DispatchMessage(ref message);
-            }
-
-            if (unmanagedReference.IsAllocated) { unmanagedReference.Free(); }
-        }
-
-        public void SetLocation(int x, int y)
-        {
-            FFI.User32.GetWindowRect(this.hWnd, out FFI.RECT rect);
-                var w = FFI.User32.GetSystemMetrics(32);
-                var h = FFI.User32.GetSystemMetrics(33);
-
-                FFI.User32.SetWindowPos(this.hWnd, FFI.WndInsertAfter.HWND_TOP, (w - (rect.right - rect.left)) / 2, (h - (rect.bottom - rect.top)) / 2, 0, 0, FFI.PositionFlag.SWP_NOZORDER | FFI.PositionFlag.SWP_NOSIZE | FFI.PositionFlag.SWP_SHOWWINDOW);
-            // FFI.User32.SetWindowPos(this.hWnd, FFI.WndInsertAfter.HWND_TOP, x, y, -1, -1, FFI.PositionFlag.SWP_NOZORDER | FFI.PositionFlag.SWP_NOSIZE | FFI.PositionFlag.SWP_SHOWWINDOW);
-        }
+        public void SetLocation(int x, int y) =>
+            FFI.User32.SetWindowPos(this.hWnd, FFI.WndInsertAfter.HWND_TOP, x, y, 0, 0, FFI.PositionFlag.SWP_NOZORDER | FFI.PositionFlag.SWP_NOSIZE | FFI.PositionFlag.SWP_SHOWWINDOW);
         
         protected virtual nint WndProc(IntPtr hWnd, uint msg, nint w, nint l)
         {
@@ -148,21 +130,22 @@ namespace Win32
 
         public bool IsShow
         {
-            get => isShown;
-            set
+            get => this.isShow;
+            set 
             {
-                isShown = value;
-                _ = FFI.User32.ShowWindow(this.hWnd, isShown ? FFI.User32.SW_SHOWNORMAL : FFI.User32.SW_HIDE);
+                this.isShow = FFI.User32.ShowWindow(this.hWnd, value ? FFI.User32.SW_SHOWNORMAL : FFI.User32.SW_HIDE);
             }
         }
 
-        public void Show()
+        public virtual void Show()
         {
-            this.IsShow = true;
-            this.ProcMessages();
+            while (FFI.User32.GetMessage(out var message, default, 0, 0))
+            {
+                FFI.User32.TranslateMessage(ref message);
+                FFI.User32.DispatchMessage(ref message);
+            }
+            if (unmanagedReference.IsAllocated) { unmanagedReference.Free(); }
         }
-
-        // public abstract void Run();
 
         public void Dispose() => Dispose(true);
     }
