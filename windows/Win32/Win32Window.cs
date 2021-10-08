@@ -1,35 +1,12 @@
 using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Win32.FFI.User32;
+using Win32.FFI.User32.Definition;
 
 namespace Win32
 {
     public class Win32Window : IDisposable
     {
-        // [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvStdcall) })]
-        // private static unsafe nint UnmanagedProcedure(nint window_handle, uint message, nuint w, nint l)
-        // {
-        //     void* userData = null;
-
-        //     if (message is FFI.Lib.WM_CREATE)
-        //     {
-        //         var createStruct = (CREATESTRUCTW*)l;
-        //         userData = createStruct->lpCreateParams;
-        //         _ = Edited.User32.SetWindowLongPtr(window_handle, Edited.Constants.GWLP_USERDATA, userData);
-        //     }
-        //     else { userData = Edited.User32.GetWindowLongPtr(window_handle, Edited.Constants.GWLP_USERDATA); }
-
-        //     if (userData is not null)
-        //     {
-        //         var unmanagedReference = GCHandle.FromIntPtr((IntPtr)userData);
-        //         var win32Window = unmanagedReference.Target as Win32Window;
-        //         return win32Window.Procedure(window_handle, message, w, l);
-        //     }
-
-        //     return User32.DefWindowProc((HWND)window_handle, message, w, l).Value;
-        // }
-
         public Win32Window(string title, int width, int height)
         {
             this.unmanagedReference = GCHandle.Alloc(this);
@@ -52,65 +29,67 @@ namespace Win32
         { 
             this.className = className;
             this.hInstance = FFI.Kernel32.GetModuleHandle(null);
-            var wc = new FFI.User32.WNDCLASSEX
+            var wc = new WNDCLASSEX
             {
-                cbSize = (uint)Marshal.SizeOf(typeof(FFI.User32.WNDCLASSEX)),
+                cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
                 style = 0,
                 lpfnWndProc = this.WndProc,
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = this.hInstance,
-                hIcon = FFI.User32.LoadIcon(IntPtr.Zero, FFI.User32.IDI_APPLICATION),
-                hCursor = FFI.User32.LoadCursor(IntPtr.Zero, FFI.User32.IDC_ARROW),
-                hbrBackground = (IntPtr)(FFI.User32.COLOR_WINDOW + 1),
+                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
+                hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
+                hbrBackground = (IntPtr)(Constants.COLOR_WINDOW + 1),
                 lpszMenuName = null,
                 lpszClassName = className,
-                hIconSm = FFI.User32.LoadIcon(IntPtr.Zero, FFI.User32.IDI_APPLICATION)
+                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION)
             };
             
-            var windowClass = FFI.User32.RegisterClassEx(ref wc);
+            var windowClass = Native.RegisterClassEx(ref wc);
             if (windowClass == 0)
                 throw new InvalidOperationException($"RegisterClassEx failed.");
         }
         
         private void Create(
             string title, 
-            int width = FFI.User32.CW_USEDEFAULT, 
-            int height = FFI.User32.CW_USEDEFAULT
+            int width = Constants.CW_USEDEFAULT, 
+            int height = Constants.CW_USEDEFAULT
         )
         {
             this.title = title;
-            this.hWnd = FFI.User32.CreateWindowEx(
-            FFI.User32.WS_EX_APPWINDOW | FFI.User32.WS_EX_WINDOWEDGE,
-            this.className,
-            title,
-            FFI.User32.WS_MINIMIZEBOX | FFI.User32.WS_MAXIMIZEBOX | FFI.User32.WS_OVERLAPPEDWINDOW | FFI.User32.WS_SYSMENU | FFI.User32.WS_OVERLAPPED | FFI.User32.WS_CAPTION,
-            FFI.User32.CW_USEDEFAULT,
-            FFI.User32.CW_USEDEFAULT,
-            width,
-            height,
-            IntPtr.Zero,
-            IntPtr.Zero,
-            hInstance,
-            IntPtr.Zero);
+            this.hWnd = Native.CreateWindowEx(
+                ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE,
+                className,
+                this.title,
+                WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION,
+                Constants.CW_USEDEFAULT,
+                Constants.CW_USEDEFAULT,
+                width,
+                height,
+                IntPtr.Zero,
+                IntPtr.Zero,
+                hInstance,
+                IntPtr.Zero);
+            if (this.hWnd is 0)
+                throw new InvalidOperationException($"CreateWindowEx failed.");
         }
 
         public void SetLocation(int x, int y) =>
-            FFI.User32.SetWindowPos(this.hWnd, FFI.WndInsertAfter.HWND_TOP, x, y, 0, 0, FFI.PositionFlag.SWP_NOZORDER | FFI.PositionFlag.SWP_NOSIZE | FFI.PositionFlag.SWP_SHOWWINDOW);
+            Native.SetWindowPos(this.hWnd, WndInsertAfter.HWND_TOP, x, y, 0, 0, SetWindowPosFlags.SWP_NOZORDER | SetWindowPosFlags.SWP_NOSIZE | SetWindowPosFlags.SWP_SHOWWINDOW);
         
-        protected virtual nint WndProc(IntPtr hWnd, uint msg, nint w, nint l)
+        protected virtual nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
         {
             switch (msg)
             {
-                case FFI.User32.WM_CLOSE:
-                    FFI.User32.DestroyWindow(hWnd);
+                case WndMessage.WM_CLOSE:
+                    Native.DestroyWindow(hWnd);
                     break;
 
-                case FFI.User32.WM_DESTROY:
-                    FFI.User32.PostQuitMessage(0);
+                case WndMessage.WM_DESTROY:
+                    Native.PostQuitMessage(0);
                     break;
                 default:
-                    return FFI.User32.DefWindowProc(hWnd, msg, w, l);
+                    return Native.DefWindowProc(hWnd, msg, w, l);
             }
             return default;
         }
@@ -133,16 +112,16 @@ namespace Win32
             get => this.isShow;
             set 
             {
-                this.isShow = FFI.User32.ShowWindow(this.hWnd, value ? FFI.User32.SW_SHOWNORMAL : FFI.User32.SW_HIDE);
+                this.isShow = Native.ShowWindow(this.hWnd, value ? ShowWindowFlags.SW_SHOWNORMAL : ShowWindowFlags.SW_HIDE);
             }
         }
 
         public virtual void Show()
         {
-            while (FFI.User32.GetMessage(out var message, default, 0, 0))
+            while (Native.GetMessage(out var message, default, 0, 0))
             {
-                FFI.User32.TranslateMessage(ref message);
-                FFI.User32.DispatchMessage(ref message);
+                Native.TranslateMessage(ref message);
+                Native.DispatchMessage(ref message);
             }
             if (unmanagedReference.IsAllocated) { unmanagedReference.Free(); }
         }

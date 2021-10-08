@@ -1,4 +1,5 @@
-namespace Win32.FFI
+
+namespace Win32.FFI.User32.Definition
 {
     public enum WndInsertAfter
     {

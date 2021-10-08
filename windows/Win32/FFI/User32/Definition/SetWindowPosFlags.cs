@@ -1,9 +1,9 @@
 using System;
 
-namespace Win32.FFI
+namespace Win32.FFI.User32.Definition
 {
     [Flags]
-    public enum PositionFlag
+    public enum SetWindowPosFlags
     {
         SWP_ASYNCWINDOWPOS = 0x4000,
         SWP_DEFERERASE = 0x2000,
