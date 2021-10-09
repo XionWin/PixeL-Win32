@@ -17,10 +17,10 @@ namespace Win32.FFI.User32
         
         [DllImport(Lib.User32)]
         public unsafe static extern nint CreateWindowEx(
-            ExtendedWindowStyles exStyle,
+            ExtendedWindowStyles extendedWindowStyles,
             string className,
-            string windowName,
-            WindowStyles style,
+            string title,
+            WindowStyles windowStyles,
             int x,
             int y,
             int width,

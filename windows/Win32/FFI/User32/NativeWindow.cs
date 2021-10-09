@@ -5,9 +5,9 @@ using Win32.FFI.User32.Definition;
 
 namespace Win32
 {
-    public class Win32Window : IDisposable
+    public abstract class NativeWindow : IDisposable
     {
-        public Win32Window(string title, int width, int height)
+        public NativeWindow(string title, int width, int height)
         {
             this.unmanagedReference = GCHandle.Alloc(this);
             Register(Guid.NewGuid().ToString());
@@ -50,26 +50,34 @@ namespace Win32
                 throw new InvalidOperationException($"RegisterClassEx failed.");
         }
         
-        private void Create(
-            string title, 
-            int width = Constants.CW_USEDEFAULT, 
-            int height = Constants.CW_USEDEFAULT
-        )
+        protected virtual void Create(
+            string className,
+            string title,
+            int width,
+            int height,
+            nint hInstance,
+            ExtendedWindowStyles extendedWindowStyles = ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE,
+            WindowStyles windowStyles = WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION,
+            int x = Constants.CW_USEDEFAULT,
+            int y = Constants.CW_USEDEFAULT,
+            nint hWndParent = 0,
+            nint hMenu = 0,
+            nint pvParam = 0)
         {
             this.title = title;
             this.hWnd = Native.CreateWindowEx(
-                ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE,
+                extendedWindowStyles,
                 className,
                 this.title,
-                WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION,
+                windowStyles,
                 Constants.CW_USEDEFAULT,
                 Constants.CW_USEDEFAULT,
                 width,
                 height,
-                IntPtr.Zero,
-                IntPtr.Zero,
+                hWndParent,
+                hMenu,
                 hInstance,
-                IntPtr.Zero);
+                pvParam);
             if (this.hWnd is 0)
                 throw new InvalidOperationException($"CreateWindowEx failed.");
         }
