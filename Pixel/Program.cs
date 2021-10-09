@@ -8,12 +8,15 @@ namespace Pixel
         {
             Console.WriteLine("Hello World!");
 
-            var window = new Win32.NativeWindow("OpenGL ES 3.0", 800, 600);
-            window.SetLocation(0, 0);
+            var window = new Win32.Window("OpenGL ES 3.0", 800, 600);
+            window.SetLocation(100, 100);
+            var r = window.GetWindowStyle();
+            window.SetWindowStyle(
+                Win32.FFI.User32.Definition.WindowStyles.WS_SYSMENU
+            );
             window.Show();
         }
     }
-
 }
 
 

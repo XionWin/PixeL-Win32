@@ -3,31 +3,29 @@ using System.Runtime.InteropServices;
 using Win32.FFI.User32;
 using Win32.FFI.User32.Definition;
 
-namespace Win32
+namespace Win32.FFI.User32
 {
     public abstract class NativeWindow : IDisposable
     {
-        public NativeWindow(string title, int width, int height)
-        {
-            this.unmanagedReference = GCHandle.Alloc(this);
-            Register(Guid.NewGuid().ToString());
-            Create(title, width, height);
-        }
-
+        private GCHandle unmanagedReference;
         private string className;
         private nint hInstance;
         private string title;
+        private int width;
+        private int height;
         private nint hWnd;
-
+        private ExtendedWindowStyles extendedWindowStyles = ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE;
+        private  WindowStyles windowStyles = 0; //WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isShow;
-        private GCHandle unmanagedReference;
         private bool isDisposed;
+        public NativeWindow(string title, int width, int height)
+        {   
+            this.title = title;
+            this.width = width;
+            this.height = height;
 
-        public nint Handle => this.hWnd;
-
-        private void Register(string className)
-        { 
-            this.className = className;
+            this.unmanagedReference = GCHandle.Alloc(this);
+            this.className = Guid.NewGuid().ToString();
             this.hInstance = FFI.Kernel32.GetModuleHandle(null);
             var wc = new WNDCLASSEX
             {
@@ -39,52 +37,66 @@ namespace Win32
                 hInstance = this.hInstance,
                 hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
                 hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
-                hbrBackground = (IntPtr)(Constants.COLOR_WINDOW + 1),
+                hbrBackground = (nint)SysColorA.COLOR_WINDOW + 1,
                 lpszMenuName = null,
                 lpszClassName = className,
                 hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION)
             };
-            
-            var windowClass = Native.RegisterClassEx(ref wc);
-            if (windowClass == 0)
+
+            if (Native.RegisterClassEx(ref wc) == 0)
                 throw new InvalidOperationException($"RegisterClassEx failed.");
-        }
-        
-        protected virtual void Create(
-            string className,
-            string title,
-            int width,
-            int height,
-            nint hInstance,
-            ExtendedWindowStyles extendedWindowStyles = ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE,
-            WindowStyles windowStyles = WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION,
-            int x = Constants.CW_USEDEFAULT,
-            int y = Constants.CW_USEDEFAULT,
-            nint hWndParent = 0,
-            nint hMenu = 0,
-            nint pvParam = 0)
-        {
-            this.title = title;
+
             this.hWnd = Native.CreateWindowEx(
-                extendedWindowStyles,
-                className,
+                this.extendedWindowStyles,
+                this.className,
                 this.title,
-                windowStyles,
+                this.windowStyles,
                 Constants.CW_USEDEFAULT,
                 Constants.CW_USEDEFAULT,
-                width,
-                height,
-                hWndParent,
-                hMenu,
+                this.width,
+                this.height,
+                0,
+                0,
                 hInstance,
-                pvParam);
+                0);
+
             if (this.hWnd is 0)
                 throw new InvalidOperationException($"CreateWindowEx failed.");
+        }
+        public nint Handle => this.hWnd;
+        public bool IsShow
+        {
+            get => this.isShow;
+            set 
+            {
+                this.isShow = Native.ShowWindow(this.hWnd, value ? ShowWindowFlags.SW_SHOWNORMAL : ShowWindowFlags.SW_HIDE);
+            }
+        }
+
+        public virtual void Show()
+        {
+            while (Native.GetMessage(out var message, default, 0, 0))
+            {
+                Native.TranslateMessage(ref message);
+                Native.DispatchMessage(ref message);
+            }
+            if (unmanagedReference.IsAllocated) { unmanagedReference.Free(); }
         }
 
         public void SetLocation(int x, int y) =>
             Native.SetWindowPos(this.hWnd, WndInsertAfter.HWND_TOP, x, y, 0, 0, SetWindowPosFlags.SWP_NOZORDER | SetWindowPosFlags.SWP_NOSIZE | SetWindowPosFlags.SWP_SHOWWINDOW);
         
+        public WindowStyles GetWindowStyle()
+        {
+            return Native.GetWindowStyle(this.hWnd);
+        }
+        public void SetWindowStyle(WindowStyles windowStyles)
+        {
+            if (Native.SetWindowStyle(this.hWnd, WindowStyles.WS_CAPTION | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_VISIBLE | windowStyles) is 0)
+                throw new InvalidOperationException($"SetWindowStyle failed.");
+        }
+                
+
         protected virtual nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
         {
             switch (msg)
@@ -113,25 +125,6 @@ namespace Win32
 
                 isDisposed = true;
             }
-        }
-
-        public bool IsShow
-        {
-            get => this.isShow;
-            set 
-            {
-                this.isShow = Native.ShowWindow(this.hWnd, value ? ShowWindowFlags.SW_SHOWNORMAL : ShowWindowFlags.SW_HIDE);
-            }
-        }
-
-        public virtual void Show()
-        {
-            while (Native.GetMessage(out var message, default, 0, 0))
-            {
-                Native.TranslateMessage(ref message);
-                Native.DispatchMessage(ref message);
-            }
-            if (unmanagedReference.IsAllocated) { unmanagedReference.Free(); }
         }
 
         public void Dispose() => Dispose(true);

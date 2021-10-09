@@ -70,6 +70,21 @@ namespace Win32.FFI.User32
         [DllImport(Lib.User32)]
         public static extern bool SetWindowPos(nint hWnd, WndInsertAfter hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags flags);
 
+
+        [DllImport(Lib.User32)]
+        public static  extern nint GetWindowLongPtr(nint hWnd, GWL GWL_STYLE);
+        
+        public static WindowStyles GetWindowStyle(nint hWnd)
+        {
+            return (WindowStyles)GetWindowLongPtr(hWnd, GWL.GWL_STYLE);
+        }
+
+        [DllImport(Lib.User32)]
+        private unsafe static extern nint SetWindowLongPtr(nint hWnd, GWL GWL_STYLE, int value);
+
+        public static nint SetWindowStyle(nint hWnd, WindowStyles windowStyles) =>
+            SetWindowLongPtr(hWnd, GWL.GWL_STYLE, (int)windowStyles);
+
         [DllImport(Lib.User32)]
         public static extern bool UpdateWindow(nint hWnd);
         
