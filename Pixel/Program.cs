@@ -10,10 +10,9 @@ namespace Pixel
 
             var window = new Win32.Window("OpenGL ES 3.0", 800, 600);
             window.SetLocation(100, 100);
-            var r = window.GetWindowStyle();
-            window.SetWindowStyle(
-                Win32.FFI.User32.Definition.WindowStyles.WS_SYSMENU
-            );
+            // window.SetWindowStyle(
+            //     Win32.FFI.User32.Definition.
+            // );
             window.Show();
         }
     }

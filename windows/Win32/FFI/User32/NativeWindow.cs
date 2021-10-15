@@ -15,7 +15,7 @@ namespace Win32.FFI.User32
         private int height;
         private nint hWnd;
         private ExtendedWindowStyles extendedWindowStyles = ExtendedWindowStyles.WS_EX_APPWINDOW | ExtendedWindowStyles.WS_EX_WINDOWEDGE;
-        private  WindowStyles windowStyles = 0; //WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
+        private  WindowStyles windowStyles = BASIC_STYLES; //WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isShow;
         private bool isDisposed;
         public NativeWindow(string title, int width, int height)
@@ -35,7 +35,7 @@ namespace Win32.FFI.User32
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = this.hInstance,
-                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
+                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ERROR),
                 hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
                 hbrBackground = (nint)SysColorA.COLOR_WINDOW + 1,
                 lpszMenuName = null,
@@ -90,9 +90,11 @@ namespace Win32.FFI.User32
         {
             return Native.GetWindowStyle(this.hWnd);
         }
+
+        private const WindowStyles BASIC_STYLES = WindowStyles.WS_SYSMENU | WindowStyles.WS_CAPTION | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_VISIBLE;
         public void SetWindowStyle(WindowStyles windowStyles)
         {
-            if (Native.SetWindowStyle(this.hWnd, WindowStyles.WS_CAPTION | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_VISIBLE | windowStyles) is 0)
+            if (Native.SetWindowStyle(this.hWnd,  BASIC_STYLES | windowStyles) is 0)
                 throw new InvalidOperationException($"SetWindowStyle failed.");
         }
                 
