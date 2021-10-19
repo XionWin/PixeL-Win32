@@ -34,12 +34,12 @@ namespace Win32.FFI.User32
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = this.hInstance,
-                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ERROR),
+                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ICON),
                 hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
                 hbrBackground = (nint)SysColorA.COLOR_WINDOW + 1,
                 lpszMenuName = null,
                 lpszClassName = className,
-                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION)
+                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ICON)
             };
 
             if (Native.RegisterClassEx(ref wc) == 0)
