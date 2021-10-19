@@ -60,7 +60,7 @@ namespace Win32.FFI.User32
                 hInstance,
                 0);
 
-            if (this.hWnd is 0)
+            if (this.hWnd == IntPtr.Zero)
                 throw new InvalidOperationException($"CreateWindowEx failed.");
         }
         public nint Handle => this.hWnd;
