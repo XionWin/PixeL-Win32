@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using Win32.FFI.User32;
 using Win32.FFI.User32.Definition;
 
 namespace Win32.FFI.User32
@@ -71,6 +70,11 @@ namespace Win32.FFI.User32
             {
                 this.isShow = Native.ShowWindow(this.hWnd, value ? ShowWindowFlags.SW_SHOWNORMAL : ShowWindowFlags.SW_HIDE);
             }
+        }
+        public string Title
+        {
+            get => this.title;
+            set => this.title = Native.SetWindowText(this.hWnd,  title) ? value :  throw new InvalidOperationException($"SetWindowTitle failed.");
         }
 
         public virtual void Show()
