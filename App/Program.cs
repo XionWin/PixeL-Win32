@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pixel
+namespace App
 {
     class Program
     {
@@ -8,9 +8,9 @@ namespace Pixel
         {
             Console.WriteLine("Hello World!");
 
-            var window = new Win32.Window("OpenGL ES 3.0", 800, 600);
-            window.SetLocation(100, 100);
+            var window = new Window.EglWindow();
             window.Show();
+
         }
     }
 }

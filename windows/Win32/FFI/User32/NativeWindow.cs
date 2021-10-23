@@ -17,7 +17,7 @@ namespace Win32.FFI.User32
         private  WindowStyles windowStyles = BASIC_STYLES; //WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isShow;
         private bool isDisposed;
-        public NativeWindow(string title, int width, int height)
+        public unsafe NativeWindow(string title, int width, int height)
         {   
             this.title = title;
             this.width = width;

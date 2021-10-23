@@ -1,3 +1,5 @@
+using Win32.FFI.User32.Definition;
+
 namespace Win32
 {
     public class Window: FFI.User32.NativeWindow
@@ -7,5 +9,6 @@ namespace Win32
         {
             
         }
+
     }
 }

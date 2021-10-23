@@ -5,7 +5,7 @@ namespace Win32.FFI.User32.Definition
     public delegate nint WndProc(nint hWnd, WndMessage msg, nint wParam, nint lParam);
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct WNDCLASSEX
+    public unsafe struct WNDCLASSEX
     {
         public uint cbSize;
         public uint style;
