@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using Win32.FFI.User32.Definition;
 
@@ -72,23 +73,28 @@ namespace Win32.FFI.User32
 
 
         [DllImport(Lib.User32)]
-        public static  extern nint GetWindowLongPtr(nint hWnd, GWL GWL_STYLE);
-        
-        public static WindowStyles GetWindowStyle(nint hWnd)
-        {
-            return (WindowStyles)GetWindowLongPtr(hWnd, GWL.GWL_STYLE);
-        }
+        private static extern nint GetWindowLongPtr(nint hWnd, GWL index);
 
         [DllImport(Lib.User32)]
-        private unsafe static extern nint SetWindowLongPtr(nint hWnd, GWL GWL_STYLE, int value);
-
-        public static nint SetWindowStyle(nint hWnd, WindowStyles windowStyles) =>
-            SetWindowLongPtr(hWnd, GWL.GWL_STYLE, (int)windowStyles);
-
+        private static extern nint SetWindowLongPtr(nint hWnd, GWL index, nint dwNewLong);
         [DllImport(Lib.User32)]
         public static extern bool UpdateWindow(nint hWnd);
         
         [DllImport(Lib.User32)]
         public static extern bool DestroyWindow(nint hwnd);
+
+        
+        
+        public static WindowStyles GetWindowStyle(nint hWnd) =>
+            (WindowStyles)GetWindowLongPtr(hWnd, GWL.GWL_STYLE);
+
+        public static bool SetWindowStyle(nint hWnd, WindowStyles windowStyles) =>
+            SetWindowLongPtr(hWnd, GWL.GWL_STYLE, (int)windowStyles) == 0;
+
+        public static object GetUserData(nint hWnd) =>
+            GCHandle.FromIntPtr(GetWindowLongPtr(hWnd, GWL.GWL_USERDATA)).Target;
+
+        public static bool SetUserData<T>(nint hWnd, T data) =>
+            SetWindowLongPtr(hWnd, GWL.GWL_USERDATA, (nint)GCHandle.Alloc(data)) == 0;
     }
 }

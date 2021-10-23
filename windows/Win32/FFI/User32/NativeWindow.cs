@@ -34,12 +34,12 @@ namespace Win32.FFI.User32
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = this.hInstance,
-                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ICON),
+                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
                 hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
                 hbrBackground = (nint)SysColorA.COLOR_WINDOW + 1,
                 lpszMenuName = null,
                 lpszClassName = className,
-                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_ICON)
+                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION)
             };
 
             if (Native.RegisterClassEx(ref wc) == 0)
@@ -98,8 +98,17 @@ namespace Win32.FFI.User32
         private const WindowStyles BASIC_STYLES = WindowStyles.WS_SYSMENU | WindowStyles.WS_CAPTION | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_VISIBLE;
         public void SetWindowStyle(WindowStyles windowStyles)
         {
-            if (Native.SetWindowStyle(this.hWnd,  BASIC_STYLES | windowStyles) is 0)
+            if (Native.SetWindowStyle(this.hWnd,  BASIC_STYLES | windowStyles) is false)
                 throw new InvalidOperationException($"SetWindowStyle failed.");
+        }
+        
+        public void SetUserData(object userData)
+        {
+            Native.SetUserData(this.hWnd, userData);
+        }
+        public T GetUserData<T>()
+        {
+            return (T)Native.GetUserData(this.hWnd);
         }
                 
 
