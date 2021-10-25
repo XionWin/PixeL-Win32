@@ -2,7 +2,7 @@ using System;
 
 namespace Win32.FFI.User32.Definition
 {
-    public enum PeekMessageA
+    public enum PeekMessageA: uint
     {
         // Messages are not removed from the queue after processing by PeekMessage.
         PM_NOREMOVE = 0x0000,

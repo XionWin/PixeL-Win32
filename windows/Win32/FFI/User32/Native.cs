@@ -16,8 +16,22 @@ namespace Win32.FFI.User32
         [return: MarshalAs(UnmanagedType.U2)]
         public static extern ushort RegisterClassEx([In] ref WNDCLASSEX wndClassEx);
         
+        public static nint CreateWindow(
+            string className,
+            string title,
+            WindowStyles windowStyles,
+            int x,
+            int y,
+            int width,
+            int height,
+            nint hWndParent,
+            nint hMenu,
+            nint hInstance,
+            nint pvParam) => 
+            CreateWindowEx(0, className, title, windowStyles, x, y, width, height, hWndParent, hMenu, hInstance, pvParam);
+
         [DllImport(Lib.User32)]
-        public unsafe static extern nint CreateWindowEx(
+        public static extern nint CreateWindowEx(
             ExtendedWindowStyles extendedWindowStyles,
             string className,
             string title,
@@ -53,13 +67,16 @@ namespace Win32.FFI.User32
         
         [DllImport(Lib.User32)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool PeekMessage(out MSG msg, nint hWnd, uint messageFilterMin, uint messageFilterMax, uint flags);
+        public static extern bool PeekMessage(out MSG msg, nint hWnd, uint messageFilterMin, uint messageFilterMax, PeekMessageA flags);
         
         [DllImport(Lib.User32)]
         public static extern bool TranslateMessage([In] ref MSG msg);
         
         [DllImport(Lib.User32)]
         public static extern void PostQuitMessage(int nExitCode);
+        
+        [DllImport(Lib.User32)]
+        public static extern nint SendMessage(IntPtr hWnd, WndMessage Msg, nuint wParam, nint lParam);
         
         
         [DllImport(Lib.User32)]

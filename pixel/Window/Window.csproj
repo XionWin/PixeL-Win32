@@ -6,5 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\windows\Win32\Win32.csproj" />
+    <ProjectReference Include="..\..\windows\EGL\EGL.csproj" />
+    <ProjectReference Include="..\..\windows\GLES\GLES.csproj" />
   </ItemGroup>
 </Project>

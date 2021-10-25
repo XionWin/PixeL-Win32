@@ -1,4 +1,4 @@
-﻿namespace GLES
+namespace OpenGLES
 {
     internal static class Lib 
     {

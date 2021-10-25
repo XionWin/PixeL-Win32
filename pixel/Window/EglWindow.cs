@@ -15,16 +15,16 @@ namespace Window
             switch (msg)
             {
                 case WndMessage.WM_PAINT:
-                    
-                    return 1;
+                    return Render();
                 default:
                     return base.WndProc(hWnd, msg, w, l);
             }
         }
 
-        public virtual void Render()
+        public virtual nint Render()
         {
-
+            var r = EGL.Egl.eglGetDisplay(IntPtr.Zero);
+            return 0;
         }
     }
 }
