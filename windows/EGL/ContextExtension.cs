@@ -11,7 +11,7 @@ namespace EGL
     
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate nint GetPlatformDisplayEXTHandler(uint platform, nint native_display, uint[] attrib_list);
-    unsafe public static class ContextExtension
+    public static class ContextExtension
     {
         public static string GetVersion(EGLDisplay display) => Egl.QueryString(display, Definition.VERSION);
         public static string GetVendor(EGLDisplay display) => Egl.QueryString(display, Definition.VENDOR);
