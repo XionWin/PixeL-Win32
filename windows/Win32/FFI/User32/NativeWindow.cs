@@ -10,8 +10,6 @@ namespace Win32.FFI.User32
         private string className;
         private nint hInstance;
         private string title;
-        private int width;
-        private int height;
         private nint hWnd;
         private  WindowStyles windowStyles = BASIC_STYLES | WindowStyles.WS_OVERLAPPEDWINDOW; // | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isShow;
@@ -19,8 +17,8 @@ namespace Win32.FFI.User32
         public unsafe NativeWindow(string title, int width, int height)
         {   
             this.title = title;
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
 
             this.unmanagedReference = GCHandle.Alloc(this);
             this.className = Guid.NewGuid().ToString();
@@ -50,8 +48,8 @@ namespace Win32.FFI.User32
                 this.windowStyles,
                 Constants.CW_USEDEFAULT,
                 Constants.CW_USEDEFAULT,
-                this.width,
-                this.height,
+                this.Width,
+                this.Height,
                 0,
                 0,
                 hInstance,
@@ -61,6 +59,10 @@ namespace Win32.FFI.User32
                 throw new InvalidOperationException($"CreateWindowEx failed.");
         }
         public nint Handle => this.hWnd;
+
+        public int Width { get; set; }
+        public int Height { get; set; }
+
         public bool IsShow
         {
             get => this.isShow;

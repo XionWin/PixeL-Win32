@@ -8,7 +8,7 @@ namespace Window
     public class EglWindow: Win32.Window
     {
         private ESContext context;
-        public EglWindow(): base("OpenGL ES 3.0", 800, 600)
+        public EglWindow(): base("OpenGL ES 3.0", 320, 320)
         {
             this.SetLocation(100, 100);
 
@@ -66,9 +66,7 @@ namespace Window
                 throw new NotSupportedException(String.Format("[EGL] Failed to make current, error {0}.", Egl.eglGetError()));
 
 
-            
-            OpenGLES.GL.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-            OpenGLES.GL.glViewport(0, 0, 400, 400);
+            OpenGLES.GL.glViewport(0, 0, this.Width, this.Height);
         }
         
         protected override nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
@@ -84,6 +82,15 @@ namespace Window
 
         public virtual nint Render()
         {
+            OpenGLES.GL.glClear(OpenGLES.Def.ClearBufferMask.ColorBufferBit);
+            if (DateTime.Now.Second % 2 == 0)
+            {
+                OpenGLES.GL.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+            }
+            else
+            {
+                OpenGLES.GL.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+            }
 
             Egl.eglSwapBuffers ( this.context.EglDisplay, this.context.EglSurface );
             return 0;
