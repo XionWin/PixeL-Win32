@@ -64,6 +64,7 @@ namespace Window
                 throw new NotSupportedException(String.Format("[EGL] Failed to make current, error {0}.", Egl.eglGetError()));
 
             OpenGLES.GL.glViewport(0, 0, this.Width, this.Height);
+            watch.Start();
         }
         
         protected override nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
@@ -72,26 +73,35 @@ namespace Window
             {
                 case WndMessage.WM_PAINT:
                     Render();
-                    break;
+                    return 0 ; //break;
             }
             return base.WndProc(hWnd, msg, w, l);
         }
-
+        ulong counter = 0;
         static bool flag = true;
+        System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
         public virtual void Render()
         {
             OpenGLES.GL.glClear(OpenGLES.Def.ClearBufferMask.ColorBufferBit);
             if (flag)
             {
-                OpenGLES.GL.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+                OpenGLES.GL.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             }
             else
             {
-                OpenGLES.GL.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+                OpenGLES.GL.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             }
-            flag = !flag;
-
             Egl.eglSwapBuffers ( this.context.EglDisplay, this.context.EglSurface );
+
+            flag = !flag;
+            counter++;
+
+            if (watch.ElapsedMilliseconds >= 500)
+            {
+                this.Title = ((double)counter / watch.ElapsedMilliseconds * 1000).ToString("#.00");
+                counter = 0;
+                watch.Restart();
+            }
         }
     }
 }

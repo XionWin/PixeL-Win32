@@ -8,11 +8,13 @@ namespace Win32.FFI.User32
     {
         private GCHandle unmanagedReference;
         private string className;
+        private WindowClassEx windowClassEx;
         private nint hInstance;
         private string title;
         private nint hWnd;
-        private  WindowStyles windowStyles = WindowStyles.WS_OVERLAPPEDWINDOW; // | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isDisposed;
+
+
         public unsafe NativeWindow(string title, int width, int height)
         {   
             this.title = title;
@@ -22,7 +24,8 @@ namespace Win32.FFI.User32
             this.unmanagedReference = GCHandle.Alloc(this);
             this.className = Guid.NewGuid().ToString();
             this.hInstance = FFI.Kernel32.GetModuleHandle(null);
-            var wc = new WindowClassEx
+
+            this.windowClassEx = new WindowClassEx
             {
                 Size = (uint)Marshal.SizeOf(typeof(WindowClassEx)),
                 ClassName = this.className,
@@ -34,13 +37,13 @@ namespace Win32.FFI.User32
                 InstanceHandle = this.hInstance
             };
 
-            if (Native.RegisterClassEx(ref wc) == 0)
+            if (Native.RegisterClassEx(ref this.windowClassEx) is false)
                 throw new InvalidOperationException($"RegisterClassEx failed.");
 
             this.hWnd = Native.CreateWindow(
                 this.className,
                 this.title,
-                this.windowStyles,
+                WindowStyles.WS_OVERLAPPEDWINDOW,
                 Constants.CW_USEDEFAULT,
                 Constants.CW_USEDEFAULT,
                 this.Width,
@@ -53,14 +56,13 @@ namespace Win32.FFI.User32
             if (this.hWnd == IntPtr.Zero)
                 throw new InvalidOperationException($"CreateWindowEx failed.");
                 
-            Native.ShowWindow(this.hWnd, ShowWindowFlags.SW_SHOWNORMAL);
-            Native.UpdateWindow(this.hWnd);
         }
         public nint Handle => this.hWnd;
 
         public int Width { get; set; }
         public int Height { get; set; }
 
+        
         public string Title
         {
             get => this.title;
@@ -69,6 +71,9 @@ namespace Win32.FFI.User32
 
         public virtual void Show()
         {
+            Native.ShowWindow(this.hWnd, ShowWindowFlags.SW_SHOWNORMAL);
+            Native.UpdateWindow(this.hWnd);
+
             while (Native.GetMessage(out var message, IntPtr.Zero, 0, 0))
             {
                 Native.TranslateMessage(ref message);
@@ -85,12 +90,11 @@ namespace Win32.FFI.User32
             return Native.GetWindowStyle(this.hWnd);
         }
 
-        private const WindowStyles BASIC_STYLES = WindowStyles.WS_SYSMENU | WindowStyles.WS_CAPTION | WindowStyles.WS_CLIPSIBLINGS | WindowStyles.WS_VISIBLE;
-        public void SetWindowStyle(WindowStyles windowStyles)
-        {
-            if (Native.SetWindowStyle(this.hWnd,  BASIC_STYLES | windowStyles) is false)
-                throw new InvalidOperationException($"SetWindowStyle failed.");
-        }
+        // public void SetWindowStyle(WindowStyles windowStyles)
+        // {
+        //     if (Native.SetWindowStyle(this.hWnd,  BASIC_STYLES | windowStyles) is false)
+        //         throw new InvalidOperationException($"SetWindowStyle failed.");
+        // }
         
         public void SetUserData(object userData)
         {
@@ -102,28 +106,14 @@ namespace Win32.FFI.User32
         }
         protected virtual nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
         {
-            // switch (msg)
-            // {
-            //     case WndMessage.WM_CLOSE:
-            //         Native.DestroyWindow(hWnd);
-            //         return 0;
-            //     case WndMessage.WM_DESTROY:
-            //         Native.PostQuitMessage(0);
-            //         return 0;
-            //     default:
-            //         return Native.DefWindowProc(hWnd, msg, w, l);
-            // }
-
-
             switch (msg)
             {
-                case WndMessage.WM_ERASEBKGND:
-                    return 1;
                 case WndMessage.WM_CLOSE:
-                {
+                    Native.DestroyWindow(hWnd);
+                    break;
+                case WndMessage.WM_DESTROY:
                     Native.PostQuitMessage(0);
                     break;
-                }
             }
             return Native.DefWindowProc(hWnd, msg, w, l);
         }

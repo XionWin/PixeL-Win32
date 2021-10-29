@@ -13,8 +13,8 @@ namespace Win32.FFI.User32
         public static extern nint LoadIcon(nint hInstance, LoadIconA lpIconName);
 
         [DllImport(Lib.User32, CharSet = Properties.BuildCharSet)]
-        [return: MarshalAs(UnmanagedType.U2)]
-        public static extern ushort RegisterClassEx([In] ref WindowClassEx wndClassEx);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool RegisterClassEx([In] ref WindowClassEx wndClassEx);
         
         public static nint CreateWindow(
             string className,
@@ -84,9 +84,11 @@ namespace Win32.FFI.User32
         public static extern bool ShowWindow(nint hWnd, ShowWindowFlags flags);
 
         [DllImport(Lib.User32, CharSet = Properties.BuildCharSet)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowText(nint hWnd, string lpString);
 
         [DllImport(Lib.User32, CharSet = Properties.BuildCharSet)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetWindowPos(nint hWnd, WndInsertAfter hWndInsertAfter, int X, int Y, int cx, int cy, SetWindowPosFlags flags);
 
 
@@ -106,8 +108,8 @@ namespace Win32.FFI.User32
         public static WindowStyles GetWindowStyle(nint hWnd) =>
             (WindowStyles)GetWindowLongPtr(hWnd, GWL.GWL_STYLE);
 
-        public static bool SetWindowStyle(nint hWnd, WindowStyles windowStyles) =>
-            SetWindowLongPtr(hWnd, GWL.GWL_STYLE, (int)windowStyles) == 0;
+        // public static bool SetWindowStyle(nint hWnd, WindowStyles windowStyles) =>
+        //     SetWindowLongPtr(hWnd, GWL.GWL_STYLE, (int)windowStyles) == 0;
 
         public static object GetUserData(nint hWnd) =>
             GCHandle.FromIntPtr(GetWindowLongPtr(hWnd, GWL.GWL_USERDATA)).Target;

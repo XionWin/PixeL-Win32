@@ -10,7 +10,6 @@ namespace App
 
             var window = new Window.EglWindow();
             window.Show();
-
         }
     }
 }
