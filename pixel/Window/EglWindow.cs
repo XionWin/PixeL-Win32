@@ -55,16 +55,13 @@ namespace Window
             if (this.context.EglContext == IntPtr.Zero)
                 throw new NotSupportedException(String.Format("[EGL] Failed to create egl context, error {0}.", Egl.eglGetError()));
 
-                
             this.context.EglSurface = Egl.eglCreateWindowSurface(this.context.EglDisplay, this.context.EglConfig, this.context.EglNativeWindow, null);
 
             if (this.context.EglSurface == IntPtr.Zero)
                 throw new NotSupportedException(String.Format("[EGL] Failed to create egl surface, error {0}.", Egl.eglGetError()));
 
-                
             if (!Egl.eglMakeCurrent(this.context.EglDisplay, this.context.EglSurface, this.context.EglSurface, this.context.EglContext))
                 throw new NotSupportedException(String.Format("[EGL] Failed to make current, error {0}.", Egl.eglGetError()));
-
 
             OpenGLES.GL.glViewport(0, 0, this.Width, this.Height);
         }
@@ -74,16 +71,17 @@ namespace Window
             switch (msg)
             {
                 case WndMessage.WM_PAINT:
-                    return Render();
-                default:
-                    return base.WndProc(hWnd, msg, w, l);
+                    Render();
+                    break;
             }
+            return base.WndProc(hWnd, msg, w, l);
         }
 
-        public virtual nint Render()
+        static bool flag = true;
+        public virtual void Render()
         {
             OpenGLES.GL.glClear(OpenGLES.Def.ClearBufferMask.ColorBufferBit);
-            if (DateTime.Now.Second % 2 == 0)
+            if (flag)
             {
                 OpenGLES.GL.glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
             }
@@ -91,9 +89,9 @@ namespace Window
             {
                 OpenGLES.GL.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
             }
+            flag = !flag;
 
             Egl.eglSwapBuffers ( this.context.EglDisplay, this.context.EglSurface );
-            return 0;
         }
     }
 }

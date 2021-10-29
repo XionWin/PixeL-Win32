@@ -11,8 +11,7 @@ namespace Win32.FFI.User32
         private nint hInstance;
         private string title;
         private nint hWnd;
-        private  WindowStyles windowStyles = BASIC_STYLES | WindowStyles.WS_OVERLAPPEDWINDOW; // | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
-        private bool isShow;
+        private  WindowStyles windowStyles = WindowStyles.WS_OVERLAPPEDWINDOW; // | WindowStyles.WS_MINIMIZEBOX | WindowStyles.WS_MAXIMIZEBOX | WindowStyles.WS_OVERLAPPEDWINDOW | WindowStyles.WS_SYSMENU | WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION;
         private bool isDisposed;
         public unsafe NativeWindow(string title, int width, int height)
         {   
@@ -23,20 +22,16 @@ namespace Win32.FFI.User32
             this.unmanagedReference = GCHandle.Alloc(this);
             this.className = Guid.NewGuid().ToString();
             this.hInstance = FFI.Kernel32.GetModuleHandle(null);
-            var wc = new WNDCLASSEX
+            var wc = new WindowClassEx
             {
-                cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
-                style = 0x0020,
-                lpfnWndProc = this.WndProc,
-                cbClsExtra = 0,
-                cbWndExtra = 0,
-                hInstance = this.hInstance,
-                hIcon = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
-                hCursor = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
-                hbrBackground = (nint)SysColorA.COLOR_WINDOW + 1,
-                lpszMenuName = null,
-                lpszClassName = className,
-                hIconSm = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION)
+                Size = (uint)Marshal.SizeOf(typeof(WindowClassEx)),
+                ClassName = this.className,
+                CursorHandle = Native.LoadCursor(IntPtr.Zero, LoadCursorA.IDC_ARROW),
+                IconHandle = Native.LoadIcon(IntPtr.Zero, LoadIconA.IDI_APPLICATION),
+                Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW,
+                BackgroundBrushHandle = new IntPtr((int) StockObject.WHITE_BRUSH),
+                WndProc = this.WndProc,
+                InstanceHandle = this.hInstance
             };
 
             if (Native.RegisterClassEx(ref wc) == 0)
@@ -57,20 +52,15 @@ namespace Win32.FFI.User32
 
             if (this.hWnd == IntPtr.Zero)
                 throw new InvalidOperationException($"CreateWindowEx failed.");
+                
+            Native.ShowWindow(this.hWnd, ShowWindowFlags.SW_SHOWNORMAL);
+            Native.UpdateWindow(this.hWnd);
         }
         public nint Handle => this.hWnd;
 
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public bool IsShow
-        {
-            get => this.isShow;
-            set 
-            {
-                this.isShow = Native.ShowWindow(this.hWnd, value ? ShowWindowFlags.SW_SHOWNORMAL : ShowWindowFlags.SW_HIDE);
-            }
-        }
         public string Title
         {
             get => this.title;
@@ -79,29 +69,7 @@ namespace Win32.FFI.User32
 
         public virtual void Show()
         {
-            // var done = true;
-            // while (done)
-            // {
-            //     var isGotMsg = Native.PeekMessage(out var message, 0, 0, 0, PeekMessageA.PM_REMOVE);
-                
-            //     if(isGotMsg)
-            //     {
-            //         if ( message.msg == WndMessage.WM_QUIT )
-            //         {
-            //             done = false;
-            //         }
-            //         else
-            //         {
-            //             Native.TranslateMessage(ref message);
-            //             Native.DispatchMessage(ref message);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         Native.SendMessage(this.hWnd, WndMessage.WM_PAINT, 0, 0);
-            //     }
-            // }
-            while (Native.GetMessage(out var message, default, 0, 0))
+            while (Native.GetMessage(out var message, IntPtr.Zero, 0, 0))
             {
                 Native.TranslateMessage(ref message);
                 Native.DispatchMessage(ref message);
@@ -134,18 +102,30 @@ namespace Win32.FFI.User32
         }
         protected virtual nint WndProc(nint hWnd, WndMessage msg, nint w, nint l)
         {
+            // switch (msg)
+            // {
+            //     case WndMessage.WM_CLOSE:
+            //         Native.DestroyWindow(hWnd);
+            //         return 0;
+            //     case WndMessage.WM_DESTROY:
+            //         Native.PostQuitMessage(0);
+            //         return 0;
+            //     default:
+            //         return Native.DefWindowProc(hWnd, msg, w, l);
+            // }
+
+
             switch (msg)
             {
+                case WndMessage.WM_ERASEBKGND:
+                    return 1;
                 case WndMessage.WM_CLOSE:
-                    Native.DestroyWindow(hWnd);
-                    break;
-                case WndMessage.WM_DESTROY:
+                {
                     Native.PostQuitMessage(0);
                     break;
-                default:
-                    return Native.DefWindowProc(hWnd, msg, w, l);
+                }
             }
-            return default;
+            return Native.DefWindowProc(hWnd, msg, w, l);
         }
 
         protected virtual void Dispose(bool disposing)
