@@ -9,20 +9,16 @@ namespace App
             Console.WriteLine("Hello World!");
             var pixel = new Pixel.Pixel(1024, 640, "OpenGL ES 3.0");
             
+            var hsl = new Color.HSLA(0, 1, 0.5);
+            var angle = 0.0f;
             ulong counter = 0;
-            bool flag = true;
             System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
             watch.Start();
             pixel.OnDraw += () => {
-                if (flag)
-                {
-                    OpenGLES.GL.glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
-                }
-                else
-                {
-                    OpenGLES.GL.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-                }
-                flag = !flag;
+                var (r, g, b, a) = hsl.ToRGBAF();
+                OpenGLES.GL.glClearColor(r, g, b, a);
+                hsl.H = angle += 0.05f;
+                hsl.H = angle %= 360;
                 counter++;
                 if (watch.ElapsedMilliseconds >= 500)
                 {
