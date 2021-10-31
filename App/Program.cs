@@ -9,14 +9,13 @@ namespace App
             Console.WriteLine("Hello World!");
             var pixel = new Pixel.Pixel(1024, 640, "OpenGL ES 3.0");
             
-            var hsl = new Color.HSLA(0, 1, 0.5);
+            var hsl = new Color.HSLA(0, 1, 0.5f);
             var angle = 0.0f;
             ulong counter = 0;
             System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
             watch.Start();
             pixel.OnDraw += () => {
-                var (r, g, b, a) = hsl.ToRGBAF();
-                OpenGLES.GL.glClearColor(r, g, b, a);
+                pixel.ClearColor(hsl);
                 hsl.H = angle += 0.05f;
                 hsl.H = angle %= 360;
                 counter++;

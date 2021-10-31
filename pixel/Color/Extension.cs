@@ -4,76 +4,76 @@ namespace Color
 {
     public static class Extension
     {
-        public static HSLA RGBToHSL(this RGBA rgb)
+        public static HSLA RGBAToHSLA(this RGBA rgba)
         {
-            var hsl = new HSLA();
+            var(h, s, l, a) = (0f, 0f, 0f, 0f);
             // Convert RGB to a 0.0 to 1.0 range.
-            double r = rgb.R / 255.0;
-            double g = rgb.G / 255.0;
-            double b = rgb.B / 255.0;
+            float r = rgba.R / 255.0f;
+            float g = rgba.G / 255.0f;
+            float b = rgba.B / 255.0f;
 
             // Get the maximum and minimum RGB components.
-            double max = r;
+            float max = r;
             if (max < g) max = g;
             if (max < b) max = b;
 
-            double min = r;
+            float min = r;
             if (min > g) min = g;
             if (min > b) min = b;
 
-            double diff = max - min;
-            hsl.L = (max + min) / 2;
+            float diff = max - min;
+            l = (max + min) / 2;
             if (Math.Abs(diff) < 0.00001)
             {
-                hsl.S = 0;
-                hsl.H = 0;  // H is really undefined.
+                s = 0;
+                h = 0;  // H is really undefined.
             }
             else
             {
-                if (hsl.L <= 0.5) hsl.S = diff / (max + min);
-                else hsl.S = diff / (2 - max - min);
+                if (l <= 0.5) s = diff / (max + min);
+                else s = diff / (2 - max - min);
 
-                double rd = (max - r) / diff;
-                double gd = (max - g) / diff;
-                double bd = (max - b) / diff;
+                float rd = (max - r) / diff;
+                float gd = (max - g) / diff;
+                float bd = (max - b) / diff;
 
-                if (r == max) hsl.H = bd - gd;
-                else if (g == max) hsl.H = 2 + rd - bd;
-                else hsl.H = 4 + gd - rd;
+                if (r == max) h = bd - gd;
+                else if (g == max) h = 2 + rd - bd;
+                else h = 4 + gd - rd;
 
-                hsl.H *= 60;
-                if (hsl.H < 0) hsl.H += 360;
+                h *= 60;
+                if (h < 0) h += 360;
             }
-            return hsl;
+            return new HSLA(h, s, l, rgba.A);
         }
 
         // Convert an HSL value into an RGB value.
-        public static RGBA HSLToRGB(this HSLA hsl)
+        public static RGBA HSLAToRGBA(this HSLA hsla)
         {
-            double p2;
-            if (hsl.L <= 0.5) p2 = hsl.L * (1 + hsl.S);
-            else p2 = hsl.L + hsl.S - hsl.L * hsl.S;
+            float p2;
+            if (hsla.L <= 0.5) p2 = hsla.L * (1 + hsla.S);
+            else p2 = hsla.L + hsla.S - hsla.L * hsla.S;
 
-            double p1 = 2 * hsl.L - p2;
-            double r, g, b;
-            if (hsl.S == 0)
+            float p1 = 2 * hsla.L - p2;
+            float r, g, b;
+            if (hsla.S == 0)
             {
-                r = hsl.L;
-                g = hsl.L;
-                b = hsl.L;
+                r = hsla.L;
+                g = hsla.L;
+                b = hsla.L;
             }
             else
             {
-                r = QqhToRgb(p1, p2, hsl.H + 120);
-                g = QqhToRgb(p1, p2, hsl.H);
-                b = QqhToRgb(p1, p2, hsl.H - 120);
+                r = QqhToRgb(p1, p2, hsla.H + 120);
+                g = QqhToRgb(p1, p2, hsla.H);
+                b = QqhToRgb(p1, p2, hsla.H - 120);
             }
 
             // Convert RGB to the 0 to 255 range.
             return new RGBA((byte)(r * 255.0), (byte)(g * 255.0), (byte)(b * 255.0));
         }
 
-        private static double QqhToRgb(double q1, double q2, double hue)
+        private static float QqhToRgb(float q1, float q2, float hue)
         {
             hue %= 360;
             if (hue < 0) hue += 360;

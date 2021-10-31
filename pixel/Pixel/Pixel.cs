@@ -29,6 +29,8 @@ namespace Pixel
             };
         }
 
+        public void ClearColor(Core.IColor color) => this.Renderer?.ClearColor(color);
+
         public void Show()
         {
             this.Window.Show();

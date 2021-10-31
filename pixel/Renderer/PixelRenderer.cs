@@ -15,7 +15,8 @@ namespace Renderer
 
         public IRenderer Initialize()
         {
-            //Make sure the NativeWindow is set.
+            if (this.Context.NativeWindow == IntPtr.Zero)
+                throw new Exception("PixelRenderer initialize error. NativeWindow not found");
             this.Context.Display = Egl.eglGetDisplay(this.Context.NativeDisplay);
             
             if (this.Context.Display == IntPtr.Zero)
