@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\pixel\Pixel\Pixel.csproj" />
     <ProjectReference Include="..\pixel\Window\Window.csproj" />
   </ItemGroup>
 </Project>

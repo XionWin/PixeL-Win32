@@ -4,7 +4,7 @@ using Win32.FFI.User32.Definition;
 
 namespace Win32.FFI.User32
 {
-    public abstract class NativeWindow : IDisposable
+    public abstract class Win32Window : IDisposable
     {
         private GCHandle unmanagedReference;
         private string className;
@@ -15,11 +15,11 @@ namespace Win32.FFI.User32
         private bool isDisposed;
 
 
-        public unsafe NativeWindow(string title, int width, int height)
+        public unsafe Win32Window(int width, int height, string title)
         {   
-            this.title = title;
             this.Width = width;
             this.Height = height;
+            this.title = title;
 
             this.unmanagedReference = GCHandle.Alloc(this);
             this.className = Guid.NewGuid().ToString();
@@ -43,7 +43,7 @@ namespace Win32.FFI.User32
             this.hWnd = Native.CreateWindow(
                 this.className,
                 this.title,
-                WindowStyles.WS_OVERLAPPEDWINDOW,
+                WindowStyles.WS_OVERLAPPED | WindowStyles.WS_CAPTION | WindowStyles.WS_SYSMENU,
                 Constants.CW_USEDEFAULT,
                 Constants.CW_USEDEFAULT,
                 this.Width,

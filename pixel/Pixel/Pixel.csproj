@@ -6,7 +6,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\..\windows\Win32\Win32.csproj" />
+    <ProjectReference Include="..\Context\Context.csproj" />
+    <ProjectReference Include="..\Renderer\Renderer.csproj" />
+    <ProjectReference Include="..\Window\Window.csproj" />
   </ItemGroup>
 </Project>
- 
