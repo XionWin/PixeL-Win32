@@ -9,5 +9,6 @@
     <ProjectReference Include="..\Context\Context.csproj" />
     <ProjectReference Include="..\Renderer\Renderer.csproj" />
     <ProjectReference Include="..\Window\Window.csproj" />
+    <ProjectReference Include="..\Analystor\Analystor.csproj" />
   </ItemGroup>
 </Project>

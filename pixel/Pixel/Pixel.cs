@@ -9,6 +9,8 @@ namespace Pixel
         protected Core.IContext Context { get; private set; }
         protected Core.IRenderer Renderer { get; private set; }
         protected Core.IWindow Window { get; private set; }
+
+        protected Core.IAnalystor Analystor { get; private set; }
         
         public Pixel(int width, int height, string name)
         {
@@ -19,6 +21,7 @@ namespace Pixel
 
             this.Renderer = new Renderer.PixelRenderer(this.Context);
             this.Window = new Window.PixelWindow(this.Context);
+            this.Analystor = new Analystor.PixelAnalystor();
 
             this.Renderer.Initialize();
 
@@ -26,6 +29,8 @@ namespace Pixel
                 this.Renderer.Clear();
                 this.OnDraw?.Invoke();
                 this.Renderer.SwapBuffers();
+                this.Analystor.Tick();
+                this.Analystor.ShowResult();
             };
         }
 
