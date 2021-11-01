@@ -3,10 +3,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\pixel\Pixel\Pixel.csproj" />
     <ProjectReference Include="..\pixel\Color\Color.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="Shader\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
   </ItemGroup>
 </Project>

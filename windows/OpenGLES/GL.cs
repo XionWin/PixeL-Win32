@@ -7,7 +7,7 @@ namespace OpenGLES
     {
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern nint glGetString(Def.StringName stringName);
-        public static string GetString(Def.StringName stringName) => Marshal.PtrToStringAuto(glGetString(stringName));
+        public static string GetString(Def.StringName stringName) => Marshal.PtrToStringAnsi(glGetString(stringName));
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glClearColor(float red, float green, float blue, float alpha);
@@ -106,7 +106,6 @@ namespace OpenGLES
         {
             glVertexAttribPointer(index, size, Def.VertexAttribPointerType.Float, normalized, stride, (nint)offset);
         }
-
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern int glGetAttribLocation (uint programId, [MarshalAs(UnmanagedType.LPStr)]string name);

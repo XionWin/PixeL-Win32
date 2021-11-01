@@ -40,14 +40,14 @@ namespace Renderer
                 Definition.BLUE_SIZE, 8,
                 Definition.ALPHA_SIZE, 8,
                 Definition.STENCIL_SIZE, 8,
-                Definition.SAMPLE_BUFFERS, 0,
-                Definition.SAMPLES, 0,
+                Definition.SAMPLE_BUFFERS, 1,
+                Definition.SAMPLES, 4,
                 Definition.NONE
             };
             
             this.Context.Config = ContextExtension.GetConfig(this.Context.Display, desiredConfig);
             var contextAttrib = new[] {
-                Definition.CONTEXT_CLIENT_VERSION, 2,
+                Definition.CONTEXT_CLIENT_VERSION, 3,
                 Definition.NONE
             };
             this.Context.Context = Egl.CreateContext(this.Context.Display, this.Context.Config, IntPtr.Zero, contextAttrib);

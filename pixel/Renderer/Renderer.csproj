@@ -9,4 +9,10 @@
     <ProjectReference Include="..\..\windows\EGL\EGL.csproj" />
     <ProjectReference Include="..\..\windows\OpenGLES\OpenGLES.csproj" />
   </ItemGroup>
+
+  <!-- <ItemGroup>
+    <Content Include="Shader\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup> -->
 </Project>
