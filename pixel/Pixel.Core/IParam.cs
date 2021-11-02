@@ -9,10 +9,5 @@ namespace Pixel.Core
         Action<IColor> RenderClearColorHandler { get; } 
         Action<nint, nint> RenderSwapBuffersHandler { get; } 
         Action<nint, nint> RenderDeleteHandler { get; } 
-
-        Action WindowCreateHandler { get; } 
-        Action WindowShowHandler { get; } 
-        event Action WindowOnPaint;
-        Action WindowDeleteHandler { get; } 
     }
 }

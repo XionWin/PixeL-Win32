@@ -65,10 +65,5 @@ namespace Pixel.Windows
         };
         public Action<nint, nint> RenderSwapBuffersHandler => (display, surface) => Egl.eglSwapBuffers (display, surface);
         public Action<nint, nint> RenderDeleteHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Action WindowCreateHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Action WindowShowHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Action WindowDeleteHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public event Action WindowOnPaint;
     }
 }
