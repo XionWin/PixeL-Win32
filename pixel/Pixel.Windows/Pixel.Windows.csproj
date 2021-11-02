@@ -11,4 +11,13 @@
     <ProjectReference Include="..\..\windows\Win32\Win32.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Mali_OpenGL_ES_Emulator\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mali_OpenGL_ES_Emulator\openglessl\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

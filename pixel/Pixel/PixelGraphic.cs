@@ -12,7 +12,7 @@ namespace Pixel
         protected IParam Param { get; private set; }
         protected PixelAnalystor Analystor { get; private set; }
 
-        public bool ShowAnalysis { get; set; }
+        public bool ShowAnalysis { get; set; } = true;
         
         public PixelGraphic(IWindow window, IContext context, IParam param)
         {
