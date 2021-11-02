@@ -1,6 +1,7 @@
 using System;
+using Pixel.Core;
 
-namespace Color
+namespace Pixel.Color
 {
     public static class Extension
     {

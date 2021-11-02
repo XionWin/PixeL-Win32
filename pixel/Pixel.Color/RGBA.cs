@@ -1,8 +1,9 @@
 ﻿using System;
+using Pixel.Core;
 
-namespace Color
+namespace Pixel.Color
 {
-    public class RGBA: Core.IColor
+    public class RGBA: IColor
     {
         public RGBA(byte r, byte g, byte b, byte a = 255)
         {

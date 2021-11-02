@@ -1,6 +1,6 @@
 using System;
 
-namespace Core
+namespace Pixel.Core
 {
     public interface IColor
     {

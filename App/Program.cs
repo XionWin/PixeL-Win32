@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Renderer.Definitions;
+using Pixel;
+using Pixel.Color;
+using Pixel.Windows;
 
 namespace App
 {
@@ -9,8 +11,16 @@ namespace App
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            var pixel = new Pixel.Pixel(1024, 640, "OpenGL ES 3.0");
-            pixel.ShowAnalysis = true;
+
+
+
+            var window = new PixelWindow(1024, 640, "OpenGL ES 3.0");
+            var context = new PixelContext(window);
+            var param = new PixelParam();
+
+            var pixel = new PixelGraphic(window, context, param);
+
+
             
             Console.WriteLine($"GL Extensions: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Extensions)}");
             Console.WriteLine($"GL Version: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Version)}");
@@ -71,7 +81,6 @@ namespace App
                     OpenGLES.GL.glBindBuffer(OpenGLES.Def.BufferTarget.ElementArrayBuffer, vbos[1]);
                     OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ElementArrayBuffer, (int)(Marshal.SizeOf(typeof(short)) * 3), (nint)ptrIndices, OpenGLES.Def.BufferUsageHint.StreamDraw);
 
-
                 
                     OpenGLES.GL.glGenVertexArrays(1, out var vao);
                     OpenGLES.GL.glBindVertexArray(vao);
@@ -97,7 +106,7 @@ namespace App
                         // var model_mat_location = OpenGLES.GL.glGetUniformLocation(program, "model_mat");
 
                         
-                        var hsl = new Color.HSLA(0, 1, 0.5f);
+                        var hsl = new HSLA(0, 1, 0.5f);
                         var angle = 0.0f;
                         pixel.OnDraw += () => {
                             pixel.ClearColor(hsl);

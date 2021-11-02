@@ -8,7 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\pixel\Pixel\Pixel.csproj" />
-    <ProjectReference Include="..\pixel\Color\Color.csproj" />
+    <ProjectReference Include="..\pixel\Pixel.Windows\Pixel.Windows.csproj" />
+    <ProjectReference Include="..\pixel\Pixel.Color\Pixel.Color.csproj" />
   </ItemGroup>
   
   <ItemGroup>

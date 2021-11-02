@@ -1,8 +1,9 @@
 using System;
+using Pixel.Core;
 
-namespace Color
+namespace Pixel.Color
 {
-    public class HSLA: Core.IColor
+    public class HSLA: IColor
     {
         public HSLA(float h, float s, float l, byte a = 255)
         {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Analystor
+namespace Pixel.Core
 {
-    public class PixelAnalystor : Core.IAnalystor
+    public class PixelAnalystor
     {
         ulong fpsCounter = 0;
         System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();

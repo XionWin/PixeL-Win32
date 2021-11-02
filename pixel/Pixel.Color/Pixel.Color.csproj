@@ -5,6 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Pixel.Core\Pixel.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Renderer.Definitions
+namespace App
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex
