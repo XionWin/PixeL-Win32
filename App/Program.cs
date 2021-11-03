@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Pixel;
+using Pixel.Drawing;
 using Pixel.Color;
 using Pixel.Windows;
 
@@ -20,15 +20,12 @@ namespace App
 
             var pixel = new PixelGraphic(window, context, param);
 
-
-            
             Console.WriteLine($"GL Extensions: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Extensions)}");
             Console.WriteLine($"GL Version: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Version)}");
             Console.WriteLine($"GL Sharding Language Version: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.ShadingLanguageVersion)}");
             Console.WriteLine($"GL Vendor: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Vendor)}");
             Console.WriteLine($"GL Renderer: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Renderer)}");
 
-            
             uint size = 3;
             const float TRIANGLE_SIZE = 0.8f;
 

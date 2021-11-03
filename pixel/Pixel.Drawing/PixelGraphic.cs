@@ -1,7 +1,7 @@
 ﻿using System;
 using Pixel.Core;
 
-namespace Pixel
+namespace Pixel.Drawing
 {
     public delegate void DrawHandle();
     public class PixelGraphic
