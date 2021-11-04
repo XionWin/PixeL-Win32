@@ -8,13 +8,13 @@ namespace Pixel.Drawing
     {
         public event DrawHandle OnDraw;
         protected IWindow Window { get; private set; }
-        protected IContext Context { get; private set; }
-        protected IParam Param { get; private set; }
+        protected IParam Context { get; private set; }
+        protected IMethod Param { get; private set; }
         protected PixelAnalystor Analystor { get; private set; }
 
         public bool ShowAnalysis { get; set; } = true;
         
-        public PixelGraphic(IWindow window, IContext context, IParam param)
+        public PixelGraphic(IWindow window, IParam context, IMethod param)
         {
             this.Window = window;
             this.Context = context;
@@ -22,12 +22,12 @@ namespace Pixel.Drawing
 
             this.Analystor = new PixelAnalystor();
 
-            this.Param.RenderCreateHandler(this.Context);
+            this.Param.RenderCreate(this.Context);
 
             window.OnPaint += () => {
-                this.Param.RenderClearHandler();
+                this.Param.RenderClear();
                 this.OnDraw?.Invoke();
-                this.Param.RenderSwapBuffersHandler(this.Context.Display, this.Context.Surface);
+                this.Param.RenderSwapBuffers(this.Context.Display, this.Context.Surface);
                 
                 if (this.ShowAnalysis)
                 {
@@ -37,7 +37,7 @@ namespace Pixel.Drawing
             };
         }
 
-        public void ClearColor(IColor color) => this.Param.RenderClearColorHandler(color);
+        public void ClearColor(IColor color) => this.Param.RenderClearColor(color);
 
         public void Show()
         {

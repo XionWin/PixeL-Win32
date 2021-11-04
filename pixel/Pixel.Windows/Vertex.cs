@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Pixel.Drawing
+namespace Pixel.Windows
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vertex

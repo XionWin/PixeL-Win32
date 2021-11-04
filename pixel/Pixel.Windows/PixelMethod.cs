@@ -5,9 +5,9 @@ using EGL.Definitions;
 
 namespace Pixel.Windows
 {
-    public class PixelParam : IParam
+    public class PixelMethod : IMethod
     {
-        public Action<IContext> RenderCreateHandler => context => {
+        public Action<IParam> RenderCreate => context => {
             if (context.NativeWindow == IntPtr.Zero)
                 throw new Exception("PixelRenderer initialize error. NativeWindow not found");
             context.Display = Egl.eglGetDisplay(context.NativeDisplay);
@@ -57,13 +57,14 @@ namespace Pixel.Windows
         };
         
         public Action<int, int> RenderSetViewPortHandler => (width, height) => OpenGLES.GL.glViewport(0, 0, width, height);
-        
-        public Action RenderClearHandler => () => OpenGLES.GL.glClear(OpenGLES.Def.ClearBufferMask.ColorBufferBit);
-        public Action<IColor> RenderClearColorHandler => color => {
+
+        public Action RenderClear => () => OpenGLES.GL.glClear(OpenGLES.Def.ClearBufferMask.ColorBufferBit);
+        public Action<IColor> RenderClearColor => color => {
             var (r, g, b, a) = color.ToRGBAF();
             OpenGLES.GL.glClearColor(r, g, b, a);
         };
-        public Action<nint, nint> RenderSwapBuffersHandler => (display, surface) => Egl.eglSwapBuffers (display, surface);
-        public Action<nint, nint> RenderDeleteHandler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public Action<nint, nint> RenderSwapBuffers => (display, surface) => Egl.eglSwapBuffers (display, surface);
+        public Action<nint, nint> RenderDelete { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }

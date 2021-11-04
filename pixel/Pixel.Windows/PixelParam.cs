@@ -3,9 +3,9 @@ using Pixel.Core;
 
 namespace Pixel.Windows
 {
-    public class PixelContext : IContext
+    public class PixelParam : IParam
     {
-        public PixelContext(IWindow window) => this.NativeWindow = window.Handle;
+        public PixelParam(IWindow window) => this.NativeWindow = window.Handle;
 
         public int Major { get; set; }
         public int Minor { get; set; }

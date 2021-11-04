@@ -145,6 +145,13 @@ namespace OpenGLES
         }
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void glDeleteBuffers (uint n, [In] uint[] buffer);
+        public static void DeleteBuffers (uint n, uint[] buffer)
+        {
+            glDeleteBuffers(n, buffer);
+        }
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glBindBuffer (Def.BufferTarget target, uint bufferId);
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]

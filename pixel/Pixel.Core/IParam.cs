@@ -1,13 +1,16 @@
-using System;
+﻿using System;
 
 namespace Pixel.Core
 {
     public interface IParam
     {
-        Action<IContext> RenderCreateHandler { get; } 
-        Action RenderClearHandler { get; } 
-        Action<IColor> RenderClearColorHandler { get; } 
-        Action<nint, nint> RenderSwapBuffersHandler { get; } 
-        Action<nint, nint> RenderDeleteHandler { get; } 
+        int Major { get; set; }
+        int Minor { get; set; }
+        nint NativeDisplay { get; set; }
+        nint NativeWindow { get; set; }
+        nint Display { get; set; }
+        nint Config { get; set; }
+        nint Context { get; set; }
+        nint Surface { get; set; }
     }
 }

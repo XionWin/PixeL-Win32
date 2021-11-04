@@ -15,8 +15,8 @@ namespace App
 
 
             var window = new PixelWindow(1024, 640, "OpenGL ES 3.0");
-            var context = new PixelContext(window);
-            var param = new PixelParam();
+            var context = new PixelParam(window);
+            var param = new PixelMethod();
 
             var pixel = new PixelGraphic(window, context, param);
 
@@ -26,6 +26,10 @@ namespace App
             Console.WriteLine($"GL Vendor: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Vendor)}");
             Console.WriteLine($"GL Renderer: {OpenGLES.GL.GetString(OpenGLES.Def.StringName.Renderer)}");
 
+
+            var shader = new PixelGLShader();
+
+            
             uint size = 3;
             const float TRIANGLE_SIZE = 0.8f;
 
@@ -58,67 +62,58 @@ namespace App
 
             var vbos = new uint[2];
 
-            unsafe
+            for (int i = 0; i < size; i++)
             {
-                fixed (Vertex* ptrVertex = vertices)
-                fixed (short* ptrIndices = indices)
+                vertices[i].x = (float)Math.Cos(-i * (2.0f * Math.PI / (size))) * TRIANGLE_SIZE;
+                vertices[i].y = (float)Math.Sin(-i * (2.0f * Math.PI / (size))) * TRIANGLE_SIZE;
+            }
+
+            OpenGLES.GL.GenBuffers((uint)vbos.Length, out vbos);
+            OpenGLES.GL.glBindBuffer(OpenGLES.Def.BufferTarget.ArrayBuffer, vbos[0]);
+            OpenGLES.GL.glBindBuffer(OpenGLES.Def.BufferTarget.ElementArrayBuffer, vbos[1]);
+           
+            
+            var hsl = new HSLA(0, 1, 0.5f);
+            var angle = 0.0f;
+
+            var random = new Random();
+            pixel.OnDraw += () => {
+                // pixel.ClearColor(hsl);
+                // hsl.H = angle += 0.05f;
+                // hsl.H = angle %= 360;
+
+                vertices[0].x = -(float)random.NextDouble();
+                vertices[0].y = (float)random.NextDouble();
+                vertices[0].r = (float)random.NextDouble();
+                vertices[0].g = (float)random.NextDouble();
+                vertices[0].b = (float)random.NextDouble();
+                vertices[0].a = 1f;
+
+                unsafe
                 {
-                    for (int i = 0; i < size; i++)
+                    fixed (Vertex* ptrVertex = vertices)
+                    fixed (short* ptrIndices = indices)
                     {
-                        vertices[i].x = (float)Math.Cos(-i * (2.0f * Math.PI / (size))) * TRIANGLE_SIZE;
-                        vertices[i].y = (float)Math.Sin(-i * (2.0f * Math.PI / (size))) * TRIANGLE_SIZE;
-                    }
-                    
-                    OpenGLES.GL.glBindVertexArray(0);
-
-                    OpenGLES.GL.GenBuffers((uint)vbos.Length, out vbos);
-                    OpenGLES.GL.glBindBuffer(OpenGLES.Def.BufferTarget.ArrayBuffer, vbos[0]);
-                    OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ArrayBuffer, (int)(Marshal.SizeOf(typeof(Vertex)) * size), (nint)ptrVertex, OpenGLES.Def.BufferUsageHint.StreamDraw);
-
-                    OpenGLES.GL.glBindBuffer(OpenGLES.Def.BufferTarget.ElementArrayBuffer, vbos[1]);
-                    OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ElementArrayBuffer, (int)(Marshal.SizeOf(typeof(short)) * 3), (nint)ptrIndices, OpenGLES.Def.BufferUsageHint.StreamDraw);
-
-                
-                    OpenGLES.GL.glGenVertexArrays(1, out var vao);
-                    OpenGLES.GL.glBindVertexArray(vao);
-
-                    OpenGLES.GL.glBindVertexArray(0);
-
-
-                    using (var program = new OpenGLES.GFX.GfxProgram(@"Shader/simplevertshader_v3.glsl", @"Shader/simplefragshader_v3.glsl"))
-                    {
-                        OpenGLES.GL.glUseProgram(program);
-                        OpenGLES.GL.glBindVertexArray(0);
-
-                        uint posAttrib = OpenGLES.GL.glGetAttribLocation(program, "a_position");
-                        OpenGLES.GL.glEnableVertexAttribArray(posAttrib);
-                        OpenGLES.GL.glVertexAttribPointerN(posAttrib, 2, false, (uint)Marshal.SizeOf(typeof(Vertex)), 0);
-
-
-                        uint colorAttrib = OpenGLES.GL.glGetAttribLocation(program, "a_color");
-                        OpenGLES.GL.glEnableVertexAttribArray(colorAttrib);
-                        OpenGLES.GL.glVertexAttribPointerN(colorAttrib, 4, false, (uint)Marshal.SizeOf(typeof(Vertex)), Marshal.SizeOf(typeof(float)) * 2);
-
-                        // var proj_mat_location = OpenGLES.GL.glGetUniformLocation(program, "proj_mat");
-                        // var model_mat_location = OpenGLES.GL.glGetUniformLocation(program, "model_mat");
-
                         
-                        var hsl = new HSLA(0, 1, 0.5f);
-                        var angle = 0.0f;
-                        pixel.OnDraw += () => {
-                            pixel.ClearColor(hsl);
-                            hsl.H = angle += 0.05f;
-                            hsl.H = angle %= 360;
+                        OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ArrayBuffer, (int)(Marshal.SizeOf(typeof(Vertex)) * size), (nint)ptrVertex, OpenGLES.Def.BufferUsageHint.StreamDraw);
 
-                            OpenGLES.GL.glBindVertexArray(0);
-                            // SetRotationMatrix(angle / 360d * Math.PI * 2, model_mat_location);
-                            OpenGLES.GL.glDrawElements(OpenGLES.Def.BeginMode.Triangles, 3, OpenGLES.Def.DrawElementsType.UnsignedShort, 0);
-                            
-                        };
+                        OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ElementArrayBuffer, (int)(Marshal.SizeOf(typeof(short)) * size), (nint)ptrIndices, OpenGLES.Def.BufferUsageHint.StreamDraw);
 
+                        shader.Use();
+
+                        // SetRotationMatrix(angle / 360d * Math.PI * 2, model_mat_location);
+                        // OpenGLES.GL.glDrawElements(OpenGLES.Def.BeginMode.Triangles, 3, OpenGLES.Def.DrawElementsType.UnsignedShort, 0);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleFan, 0, size);
                     }
                 }
-            }
+
+
+                
+      
+                
+            };
+
+            
 
             
 
