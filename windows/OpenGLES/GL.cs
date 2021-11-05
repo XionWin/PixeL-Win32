@@ -17,7 +17,14 @@ namespace OpenGLES
         public static extern void glClear(Def.ClearBufferMask mask);
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
-        public static extern uint glGetError();
+        private static extern uint glGetError();
+
+        public static void GetError(string extraMessage = null)
+        {
+            if(GL.glGetError() is var errorCode && errorCode != 0) 
+                throw new OpenGLESException($"ErrorCode: {errorCode}"
+                + (string.IsNullOrEmpty(extraMessage) ? string.Empty : $" ExtralMessage: {extraMessage}"));
+        }
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern uint glCreateProgram ();
@@ -121,15 +128,53 @@ namespace OpenGLES
             return glGetUniformLocation(program.Id, name) is var r && r >= 0 ? (uint)r : throw new OpenGLESException();
         }
 
-
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glEnableVertexAttribArray (uint index);
-        
+
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glDrawArrays(Def.BeginMode beginMode, int first, uint count);
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glDrawElements (Def.BeginMode beginMode, uint count, Def.DrawElementsType type, nint indices);
+
+
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glEnable (Def.EnableCap cap);
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glStencilMask (uint mask);
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glStencilFunc (Def.StencilFunction func, int ref_, uint mask);
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glStencilOp (Def.StencilOp fail, Def.StencilOp zFail, Def.StencilOp zPass);
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glColorMask (bool red, bool green, bool blue, bool alpha);
+        
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void glDisable (Def.EnableCap cap);
+
+
+        [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern void glUniform4fv (int location, int count, float *value);
+
+        
+        public static void Uniform4fv (int location, float[] value)
+        {
+            unsafe
+            {
+                 fixed (float *ptr = value)
+                 {
+                    glUniform4fv (location, value.Length, ptr);
+                 }
+            }
+        }
+        
+
+
 
         [DllImport(Lib.Name, CallingConvention = CallingConvention.Cdecl)]
         public static extern void glGenVertexArrays (uint n, out uint arrayId);

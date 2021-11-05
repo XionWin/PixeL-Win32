@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Pixel.Drawing;
 using Pixel.Color;
 using Pixel.Windows;
+using System.Collections.Generic;
 
 namespace App
 {
@@ -13,8 +14,8 @@ namespace App
             Console.WriteLine("Hello World!");
 
 
-
-            var window = new PixelWindow(1024, 640, "OpenGL ES 3.0");
+            var (width, height) = (1024, 640);
+            var window = new PixelWindow(width, height, "OpenGL ES 3.0");
             var context = new PixelParam(window);
             var param = new PixelMethod();
 
@@ -30,58 +31,47 @@ namespace App
             var shader = new PixelGLShader();
 
             
-            uint size = 6;
             const float TRIANGLE_SIZE = 0.8f;
 
-            var vertices = new Vertex[size];
-            vertices[0].x = 0f;
-            vertices[0].y = 0f;
-            vertices[0].r = 1f;
-            vertices[0].g = .0f;
-            vertices[0].b = .0f;
-            vertices[0].a = 1f;
-
-            vertices[1].x = 0f;
-            vertices[1].y = -.25f;
-            vertices[1].r = .0f;
-            vertices[1].g = 1f;
-            vertices[1].b = .0f;
-            vertices[1].a = 1f;
-
-            vertices[2].x = -.25f;
-            vertices[2].y = 0f;
-            vertices[2].r = .0f;
-            vertices[2].g = .0f;
-            vertices[2].b = 1f;
-            vertices[2].a = 1f;
-
-            
-            vertices[3].x = 0f;
-            vertices[3].y = 0f;
-            vertices[3].r = 1f;
-            vertices[3].g = .0f;
-            vertices[3].b = .0f;
-            vertices[3].a = 1f;
-
-            vertices[4].x = 0f;
-            vertices[4].y = .25f;
-            vertices[4].r = .0f;
-            vertices[4].g = 1f;
-            vertices[4].b = .0f;
-            vertices[4].a = 1f;
-
-            vertices[5].x = .25f;
-            vertices[5].y = 0f;
-            vertices[5].r = .0f;
-            vertices[5].g = .0f;
-            vertices[5].b = 1f;
-            vertices[5].a = 1f;
-            
-            var indices = new short[]
-            {
-                0, 1, 2, 
-                3, 4, 5
+            var vs = new List<Vertex>() {
+                new Vertex(){
+                    x = 0f,
+                    y = 0f,
+                    u = 0f,
+                    v = 1f,
+                },
+                new Vertex(){
+                    x = 0f,
+                    y = 320f,
+                    u = 1f,
+                    v = .0f,
+                },
+                new Vertex(){
+                    x = 512f,
+                    y = 0f,
+                    u = 1f,
+                    v = .0f,
+                },
+                // new Vertex(){
+                //     x = 407f / width / 2,
+                //     y = 392f / height / 2,
+                //     r = 1f,
+                //     g = .0f,
+                //     b = .0f,
+                //     a = 1f,
+                // }
             };
+
+            
+            int size = vs.Count;
+
+            var vertices = vs.ToArray();
+            
+            // var indices = new short[]
+            // {
+            //     0, 1, 2, 
+            //     3, 4, 5
+            // };
 
             var vbos = new uint[2];
 
@@ -105,29 +95,76 @@ namespace App
                 // hsl.H = angle += 0.05f;
                 // hsl.H = angle %= 360;
 
-                vertices[0].x = -(float)random.NextDouble();
-                vertices[0].y = (float)random.NextDouble();
-                vertices[0].r = (float)random.NextDouble();
-                vertices[0].g = (float)random.NextDouble();
-                vertices[0].b = (float)random.NextDouble();
-                vertices[0].a = 1f;
+                // vertices[0].x = -(float)random.NextDouble();
+                // vertices[0].y = (float)random.NextDouble();
+                // vertices[0].r = (float)random.NextDouble();
+                // vertices[0].g = (float)random.NextDouble();
+                // vertices[0].b = (float)random.NextDouble();
+                // vertices[0].a = 1f;
+
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    vertices[i].a = angle;
+                }
+                
+                angle+= 0.05f;
+                angle %= 360f;
 
                 unsafe
                 {
                     fixed (Vertex* ptrVertex = vertices)
-                    fixed (short* ptrIndices = indices)
+                    // fixed (short* ptrIndices = indices)
                     {
                         
                         OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ArrayBuffer, (int)(Marshal.SizeOf(typeof(Vertex)) * size), (nint)ptrVertex, OpenGLES.Def.BufferUsageHint.StreamDraw);
 
-                        OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ElementArrayBuffer, (int)(Marshal.SizeOf(typeof(short)) * size), (nint)ptrIndices, OpenGLES.Def.BufferUsageHint.StreamDraw);
+                        // OpenGLES.GL.glBufferData(OpenGLES.Def.BufferTarget.ElementArrayBuffer, (int)(Marshal.SizeOf(typeof(short)) * size), (nint)ptrIndices, OpenGLES.Def.BufferUsageHint.StreamDraw);
 
                         shader.Use();
 
+
+
+
+                        OpenGLES.GL.glEnable(OpenGLES.Def.EnableCap.StencilTest);
+                        OpenGLES.GL.glStencilMask(0xff);
+
+                        OpenGLES.GL.glStencilFunc(OpenGLES.Def.StencilFunction.Equal, 0x00, 0xff);
+                        OpenGLES.GL.glStencilOp(OpenGLES.Def.StencilOp.Keep, OpenGLES.Def.StencilOp.Keep, OpenGLES.Def.StencilOp.Incr);
+
+                        OpenGLES.GL.GetError("Stroke fill 0");
+
                         // SetRotationMatrix(angle / 360d * Math.PI * 2, model_mat_location);
                         // OpenGLES.GL.glDrawElements(OpenGLES.Def.BeginMode.Triangles, 3, OpenGLES.Def.DrawElementsType.UnsignedShort, 0);
-                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleFan, 0, 3);
-                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleFan, 3, 3);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 0, 3);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 3, 3);
+
+                        
+
+                        OpenGLES.GL.glStencilFunc(OpenGLES.Def.StencilFunction.Equal, 0x00, 0xff);
+                        OpenGLES.GL.glStencilOp(OpenGLES.Def.StencilOp.Keep, OpenGLES.Def.StencilOp.Keep, OpenGLES.Def.StencilOp.Keep);
+
+                        OpenGLES.GL.GetError("Stroke fill 0");
+
+                        // SetRotationMatrix(angle / 360d * Math.PI * 2, model_mat_location);
+                        // OpenGLES.GL.glDrawElements(OpenGLES.Def.BeginMode.Triangles, 3, OpenGLES.Def.DrawElementsType.UnsignedShort, 0);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 0, 3);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 3, 3);
+
+                        
+
+                        OpenGLES.GL.glStencilFunc(OpenGLES.Def.StencilFunction.Equal, 0x00, 0xff);
+                        OpenGLES.GL.glStencilOp(OpenGLES.Def.StencilOp.Zero, OpenGLES.Def.StencilOp.Zero, OpenGLES.Def.StencilOp.Zero);
+
+                        OpenGLES.GL.GetError("Stroke fill 0");
+
+                        // SetRotationMatrix(angle / 360d * Math.PI * 2, model_mat_location);
+                        // OpenGLES.GL.glDrawElements(OpenGLES.Def.BeginMode.Triangles, 3, OpenGLES.Def.DrawElementsType.UnsignedShort, 0);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 0, 3);
+                        OpenGLES.GL.glDrawArrays(OpenGLES.Def.BeginMode.TriangleStrip, 3, 3);
+
+                        
+                        OpenGLES.GL.glColorMask(true, true, true, true);
+                        OpenGLES.GL.glDisable(OpenGLES.Def.EnableCap.StencilTest);
                     }
                 }
 

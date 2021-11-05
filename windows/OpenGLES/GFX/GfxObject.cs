@@ -16,7 +16,7 @@ namespace OpenGLES.GFX
         public static T Check<T>(this T obj)
         where T: GfxObject
         {
-            if(GL.glGetError() is var errorCode && errorCode != 0) throw new OpenGLESException($"Check GfxObject Error: {errorCode}");
+            GL.GetError("Check GfxObject Error");
             return obj;
         }
     }

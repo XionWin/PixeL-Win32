@@ -7,9 +7,8 @@ namespace Pixel.Windows
     {
         public float x { get; set; }
         public float y { get; set; }
-        public float r { get; set; }
-        public float g { get; set; }
-        public float b { get; set; }
+        public float u { get; set; }
+        public float v { get; set; }
         public float a { get; set; }
     }
 }
